@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/user');
 const passport = require('passport');
+const authenticate = require('../authenticate');
 
 const router = express.Router();
 
@@ -30,9 +31,10 @@ router.post('/signup', (req, res) => {
 });
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
+    const token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type', 'appliction/json');
-    res.json({success: true, status: 'Your are succesfully logged in'});
+    res.json({success: true, token: token, status: 'Your are succesfully logged in'});
 });
 
 router.get('/logout', (req, res, next) => {
@@ -41,7 +43,7 @@ router.get('/logout', (req, res, next) => {
         res.clearCookie('session-id');
         res.redirect('/');
     } else {
-        const error = new Error('You are not logged in');
+        const err = new Error('You are not logged in');
         err.status = 401;
         return next(err);
     }
