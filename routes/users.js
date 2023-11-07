@@ -6,8 +6,11 @@ const authenticate = require('../authenticate');
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+      User.find()
+      .then(users => res.status(200).json(users))
+      .catch(err => next(err))
+  // res.send('respond with a resource');
 });
 
 router.post('/signup', (req, res) => {
